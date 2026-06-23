@@ -26,7 +26,13 @@ jobs:
       uses: android-actions/setup-android@v3
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --info --stacktrace
+      run: |
+        echo "::group::Kotlin Compile Output"
+        ./gradlew compileDebugKotlin --no-daemon 2>&1 || true
+        echo "::endgroup::"
+        echo "::group::Full Assembly"
+        ./gradlew assembleDebug --stacktrace 2>&1
+        echo "::endgroup::"
 
     - name: Build Release APK
       run: ./gradlew assembleRelease --info --stacktrace
