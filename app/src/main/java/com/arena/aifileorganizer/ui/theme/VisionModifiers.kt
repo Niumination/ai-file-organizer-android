@@ -170,11 +170,10 @@ fun Modifier.visionAurora() = drawBehind {
 
 // --- 3D tilt — Interactive 3D Character / 3D Folder ---
 // dhiluxui / avanishverma4
-fun Modifier.visionTilt(rx: Float, ry: Float, tz: Float = 0f) =
+fun Modifier.visionTilt(rx: Float, ry: Float) =
     this.graphicsLayer {
         rotationX = rx
         rotationY = ry
-        translationZ = tz
         cameraDistance = 14 * density
         transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.5f)
     }

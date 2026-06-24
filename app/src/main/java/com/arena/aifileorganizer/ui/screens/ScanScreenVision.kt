@@ -87,7 +87,7 @@ fun ScanScreenVision(
                     ) {
                         // conic glow ring
                         Canvas(Modifier.fillMaxSize()) {
-                            rotate(spin) {
+                            rotate(degrees = spin, pivot = center) {
                                 drawCircle(
                                     brush = Brush.sweepGradient(
                                         0f to Color(0xFFB99CFF).copy(alpha = 0.0f),
