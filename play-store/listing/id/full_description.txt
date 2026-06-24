@@ -1,0 +1,55 @@
+🧹 HP penuh file berantakan? Biarkan AI yang beresin – dengan UI seindah visionOS!
+
+AI File Organizer v1.1 merapikan ribuan file di HP / SD Card otomatis pakai Google Gemini AI. Desain baru: Apple Vision Pro Liquid Glass.
+
+✨ YANG BARU DI v1.1
+• UI visionOS Liquid Glass – frosted glass, orbs 3D, animasi spatial
+• CardStack folder picker – geser kartu 3D
+• Orbit AI scanner – real-time
+• Confetti sparkle saat eksekusi
+• 40% lebih cepat, smoother
+
+✨ FITUR UNGGULAN
+• AI Smart Categorize – baca ISI file, bukan cuma nama
+  PDF → ekstrak otomatis • Gambar → OCR struk Tokopedia, Shopee, Gojek, KTP
+• 13 Kategori cerdas Indonesia
+  Dokumen Kerja, Struk & Invoice, Foto Pribadi, Screenshot, Ebook, Video, Audio, Arsip Project, APK, dll
+• Rename otomatis rapi
+  "IMG_4839.jpg" → "2024-06-22_Foto_Liburan_Bali.jpg"
+• 100% Aman – Scoped Storage (SAF)
+  Kamu pilih folder sendiri. App TIDAK BISA akses /Android
+• Preview dulu sebelum eksekusi + Dry-Run
+
+🔒 PRIVACY FIRST
+• Tidak upload file ke server kami
+• AI analisis hanya kirim teks preview max 600 karakter
+• API key disimpan EncryptedSharedPreferences (AES-256)
+• Open source – audit kapan saja
+• Tidak ada iklan, tidak ada tracker
+
+🚀 CARA PAKAI
+1. Dapatkan API key gratis di aistudio.google.com
+2. Pilih folder Download / DCIM / Dokumen
+3. Tap "Mulai Scan"
+4. AI analisis → lihat preview
+5. Tap Eksekusi → file langsung rapi!
+
+📁 OUTPUT
+FolderPilihan/AI_Organized/
+├── Dokumen_Kerja/PDF/
+├── Struk_Invoice/Tokopedia/
+├── Foto_Pribadi/Kamera/
+├── Ebook/
+└── ...
+
+COCOK UNTUK
+✓ HP penuh screenshot & download random
+✓ Freelancer rapikan invoice
+✓ Mahasiswa rapikan materi kuliah
+✓ Semua orang yang file HP-nya chaos
+
+Syarat: Android 11+
+API Key: gratis di aistudio.google.com/app/apikey
+
+Open source MIT
+github.com/niumination/ai-file-organizer-android
