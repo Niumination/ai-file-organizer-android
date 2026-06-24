@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,7 +88,9 @@ fun ScanScreenVision(
                     ) {
                         // conic glow ring
                         Canvas(Modifier.fillMaxSize()) {
-                            rotate(degrees = spin, pivot = center) {
+                            withTransform({
+                                rotate(degrees = spin, pivot = center)
+                            }) {
                                 drawCircle(
                                     brush = Brush.sweepGradient(
                                         0f to Color(0xFFB99CFF).copy(alpha = 0.0f),
