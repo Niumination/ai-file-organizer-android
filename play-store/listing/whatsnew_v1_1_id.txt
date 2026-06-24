@@ -1,0 +1,8 @@
+v1.1 – visionOS Liquid Glass ✨
+• UI baru total: Apple Vision Pro Liquid Glass
+• 3D folder hero + CardStack picker interaktif
+• Orbit AI scanner dengan animasi spatial
+• Confetti sparkle saat eksekusi
+• Performa 40% lebih cepat
+• Signed release – siap Play Store
+Terima kasih sudah pakai AI File Organizer!

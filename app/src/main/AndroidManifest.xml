@@ -1,5 +1,7 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -8,16 +10,24 @@
         android:label="AI File Organizer"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AIFileOrganizer">
+        android:theme="@style/Theme.AIFileOrganizer"
+        android:enableOnBackInvokedCallback="true">
+        <!-- v1.1 visionOS – main launcher -->
         <activity
-            android:name=".MainActivity"
+            android:name=".MainActivityVision"
             android:exported="true"
             android:label="AI File Organizer"
-            android:theme="@style/Theme.AIFileOrganizer">
+            android:theme="@style/Theme.AIFileOrganizer"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- legacy v1.0 kept for rollback -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            tools:node="remove" />
     </application>
 </manifest>
