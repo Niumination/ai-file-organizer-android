@@ -6,9 +6,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.arena.aifileorganizer.R
 
 /**
  * AI File Organizer v1.1 – visionOS Liquid Glass
@@ -84,8 +86,14 @@ fun AIFileOrganizerThemeVision(
     )
 }
 
-private val Fraunces = FontFamily.Serif // replace with downloadable Fraunces if bundled
-private val Instrument = FontFamily.SansSerif // replace with Instrument Sans if bundled
+// visionOS Fonts — downloaded from Google Fonts, bundled in res/font/
+private val Fraunces = FontFamily(
+    Font(R.font.fraunces, FontWeight.Medium)
+)
+private val Instrument = FontFamily(
+    Font(R.font.instrument_sans_regular, FontWeight.Normal),
+    Font(R.font.instrument_sans_semibold, FontWeight.SemiBold)
+)
 
 val VisionTypography = Typography(
     displayLarge = TextStyle(

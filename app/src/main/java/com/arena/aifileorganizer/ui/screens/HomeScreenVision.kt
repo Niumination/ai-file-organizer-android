@@ -109,7 +109,6 @@ fun HomeScreenVision(
             }
         },
         snackbarHost = { SnackbarHost(snackbar) },
-        bottomBar = { Spacer(Modifier.height(4.dp)) }
     ) { pad ->
         Column(
             Modifier
@@ -124,22 +123,24 @@ fun HomeScreenVision(
             Text(
                 "Rapikan file",
                 style = MaterialTheme.typography.displayLarge,
-                color = VisionColors.ink
+                color = VisionColors.ink,
+                maxLines = 2
             )
             Text(
                 "otomatis pakai AI",
                 style = MaterialTheme.typography.displayLarge,
-                color = VisionColors.accent
+                color = VisionColors.accent,
+                maxLines = 1
             )
             Text(
-                "Gemini • PDF extract • ML Kit OCR • 100% SAF",
+                "Gemini • PDF • OCR • 100% Aman dengan SAF",
                 style = MaterialTheme.typography.bodyMedium,
                 color = VisionColors.muted
             )
 
             // KPI
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                VisionKpi("1,284", "file di-scan", Modifier.weight(1f))
+                VisionKpi("1.284", "file discan", Modifier.weight(1f))
                 VisionKpi("13", "kategori", Modifier.weight(1f))
                 VisionKpi("98%", "akurat", Modifier.weight(1f))
             }
@@ -158,7 +159,7 @@ fun HomeScreenVision(
                         shape = RoundedCornerShape(8.dp),
                         color = Color.White.copy(alpha = 0.55f)
                     ) {
-                        Text(" encrypted ", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                        Text(" terenkripsi ", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
                     }
                 }
                 OutlinedTextField(
@@ -182,26 +183,13 @@ fun HomeScreenVision(
                         onClick = {
                             haptics.tick()
                             onSaveApiKey(keyInput)
-                            scope.launch { snackbar.showSnackbar("API key disimpan encrypted ✓") }
+                            scope.launch { snackbar.showSnackbar("API key tersimpan aman (terenkripsi) ✓") }
                         },
                         enabled = keyInput.isNotBlank()
                     )
-                    OutlinedButton(
-                        onClick = { /* open browser elsewhere */ },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White.copy(alpha = 0.38f)
-                        ),
-                        border = ButtonDefaults.outlinedButtonBorder.copy(
-                            brush = Brush.verticalGradient(
-                                listOf(Color.White.copy(alpha = 0.8f), Color.White.copy(alpha = 0.4f))
-                            )
-                        )
-                    ) { Text("Gratis →", fontSize = 12.8.sp, color = VisionColors.ink) }
                 }
                 Text(
-                    "Disimpan EncryptedSharedPreferences • open source",
+                    "Tersimpan aman (EncryptedSharedPreferences) • open source",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -222,7 +210,7 @@ fun HomeScreenVision(
 
             // --- CTA — Apple Tahoe Liquid Glass Button — easemize ---
             LiquidGlassButton(
-                text = "Mulai Scan & Analisis AI  →",
+                text = "Mulai Scan & Analisis AI →",
                 dark = true,
                 enabled = canStart,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -240,7 +228,7 @@ fun HomeScreenVision(
                 )
             }
             Text(
-                "Output → AI_Organized/  •  Preview  •  Dry-run",
+                "Output → AI_Organized/  •  Pratinjau  •  Uji Coba",
                 style = MaterialTheme.typography.bodySmall,
                 color = VisionColors.muted,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -263,8 +251,8 @@ private fun SpatialHero() {
         Modifier
             .fillMaxWidth()
             .height(222.dp)
-            .liquidGlass(corner = 28.dp, strong = true)
-            .visionAurora()
+            .visionAurora()   // aurora drawn FIRST (behind liquid glass)
+            .liquidGlass(corner = 28.dp, strong = true) // glass on top, translucent
             .pointerInput(Unit) {
                 detectDragGestures { change, drag ->
                     ry = (ry + drag.x * 0.045f).coerceIn(-14f, 14f)
@@ -386,14 +374,14 @@ private fun VisionCardStack(pickedUri: String?, onPick: () -> Unit) {
     Box(
         Modifier
             .fillMaxWidth()
-            .height(134.dp)
+            .height(120.dp) // reduced from 134.dp for better fit
     ) {
         val items = listOf(
-            Triple("📁 /Android", "— blocked", 2),
+            Triple("📁 /Android", "— dibatasi SAF", 2),
             Triple("📁 /DCIM", "— 412 foto", 1),
             Triple(
                 pickedUri?.let { "📂 ${it.takeLast(32)}" } ?: "📂 Pilih folder…",
-                "SAF • user-granted only",
+                "SAF • akses terbatas",
                 0
             )
         )
@@ -405,7 +393,7 @@ private fun VisionCardStack(pickedUri: String?, onPick: () -> Unit) {
                     .graphicsLayer {
                         scaleX = s.scale
                         scaleY = s.scale
-                        translationY = s.y
+                        translationY = s.y + 4f // add slight bottom offset
                         rotationZ = s.rot
                         alpha = s.alpha
                     }
@@ -439,7 +427,7 @@ private fun VisionCardStack(pickedUri: String?, onPick: () -> Unit) {
         Text("Pilih Folder di Storage / SD Card", fontWeight = FontWeight.Medium)
     }
     Text(
-        "App HANYA akses folder yang kamu pilih. /Android otomatis di-skip.",
+        "App HANYA akses folder yang kamu pilih. /Android otomatis dilewati.",
         style = MaterialTheme.typography.bodySmall,
         color = VisionColors.muted,
         modifier = Modifier.padding(top = 6.dp)

@@ -52,7 +52,7 @@ fun ScanScreenVision(
         containerColor = VisionColors.paper,
         topBar = {
             TopAppBar(
-                title = { Text("AI Scanning…", fontWeight = FontWeight.SemiBold) },
+                title = { Text("Memindai Berkas…", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     TextButton(onClick = onBack) { Text("← Kembali", color = VisionColors.muted) }
                 },
@@ -67,7 +67,7 @@ fun ScanScreenVision(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                "Scanning\nfiles…",
+                "Memindai\nberkas…",
                 style = MaterialTheme.typography.headlineLarge,
                 color = VisionColors.ink
             )
@@ -153,7 +153,7 @@ fun ScanScreenVision(
                     Text(msg, fontWeight = FontWeight.Medium, fontSize = 14.sp)
                     Spacer(Modifier.height(10.dp))
 
-                    // liquid progress
+                    // liquid progress — dynamic percentage
                     Box(
                         Modifier
                             .fillMaxWidth()
@@ -162,8 +162,17 @@ fun ScanScreenVision(
                             .background(Color.White.copy(alpha = 0.52f))
                             .border(1.dp, Color.White.copy(alpha = 0.84f), RoundedCornerShape(999.dp))
                     ) {
-                        val pct = when (state) {
-                            is OrganizerViewModel.ScanState.Scanning -> 0.45f
+                        val pct = when (val s = state) {
+                            is OrganizerViewModel.ScanState.Scanning -> {
+                                // parse progress from msg like "Ekstrak 5/150"
+                                val regex = Regex("""(\d+)/(\d+)""")
+                                val m = regex.find(s.msg)
+                                if (m != null) {
+                                    val cur = m.groupValues[1].toFloatOrNull() ?: 0f
+                                    val total = m.groupValues[2].toFloatOrNull() ?: 1f
+                                    (cur / total).coerceIn(0.02f, 0.97f)
+                                } else 0.45f // fallback
+                            }
                             is OrganizerViewModel.ScanState.Done -> 1f
                             else -> 0.12f
                         }
@@ -185,7 +194,7 @@ fun ScanScreenVision(
 
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        "Full Content: PDF extract + OCR gambar + Gemini",
+                        "Ekstrak: PDF + OCR gambar + Gemini AI",
                         style = MaterialTheme.typography.bodySmall,
                         color = VisionColors.muted
                     )
@@ -193,14 +202,16 @@ fun ScanScreenVision(
             }
 
             // KPI – 2x2 glass
-            val planSize = vm.plan.collectAsState().value.size
+            val planItems = vm.plan.collectAsState().value
+            val planSize = planItems.size
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MetricGlass("File", if (planSize>0) "$planSize" else "—", Modifier.weight(1f))
-                MetricGlass("OCR", "—", Modifier.weight(1f))
+                MetricGlass("Berkas", if (planSize > 0) "$planSize" else "—", Modifier.weight(1f))
+                MetricGlass("OCR", if (planSize > 0) "${planItems.count { !it.content?.ocrText.isNullOrBlank() }}" else "—", Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MetricGlass("AI", "—", Modifier.weight(1f))
-                MetricGlass("Token", "—", Modifier.weight(1f))
+                val aiCount = planItems.count { it.decision.confidence > 0.5f }
+                MetricGlass("AI", if (planSize > 0) "$aiCount" else "—", Modifier.weight(1f))
+                MetricGlass("Kategori", if (planSize > 0) "${planItems.map { it.decision.category }.distinct().size}" else "—", Modifier.weight(1f))
             }
 
             OutlinedButton(
