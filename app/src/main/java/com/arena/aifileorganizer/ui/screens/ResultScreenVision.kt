@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,9 +50,9 @@ fun ResultScreenVision(
     // auto confetti when execute finishes successfully
     val logText = log
     LaunchedEffect(logText) {
-        if (logText.contains("Sukses:") && !logText.contains("DRY-RUN") && !logText.contains("0," , true).not()) {
-            // naive: if success >0
-            val successNum = Regex("""Sukses:\s*(\d+)""").find(logText)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 0
+        if (logText.contains("Sukses:") && !logText.contains("DRY-RUN")) {
+            val successNum = Regex("""Sukses:\s*(\d+)""").find(logText)
+                ?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 0
             if (successNum > 0) {
                 haptics.success()
                 showConfetti = true
@@ -61,12 +60,11 @@ fun ResultScreenVision(
         }
     }
 
-    Box {
     Scaffold(
         containerColor = VisionColors.paper,
         topBar = {
             TopAppBar(
-                title = { Text("Preview Plan • ${plan.size} file", fontWeight = FontWeight.SemiBold) },
+                title = { Text("Pratinjau • ${plan.size} berkas", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     TextButton(onClick = {
                         haptics.light()
@@ -97,7 +95,7 @@ fun ResultScreenVision(
                             containerColor = Color.White.copy(alpha = 0.42f),
                             contentColor = VisionColors.ink
                         )
-                    ) { Text("🧪 Dry-Run", fontWeight = FontWeight.SemiBold, fontSize = 13.sp) }
+                    ) { Text("🧪 Uji Coba", fontWeight = FontWeight.SemiBold, fontSize = 13.sp) }
 
                     Button(
                         onClick = { haptics.light(); vm.executePlan(dryRun = false) },
@@ -117,7 +115,7 @@ fun ResultScreenVision(
             Row(
                 Modifier
                     .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 cats.forEach { c ->
@@ -142,22 +140,20 @@ fun ResultScreenVision(
                     }
                 }
             }
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(6.dp))
 
             val filtered = if (filter == "Semua") plan else plan.filter { it.decision.category == filter }
 
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(11.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(filtered, key = { _, it -> it.file.uri.toString() }) { idx, item ->
-                    val rot = if (idx % 2 == 0) -0.18f else 0.18f
-                    // Liquid Glass Card – designali-in
+                    // Liquid Glass Card – designali-in (no micro-jitter rotation)
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .graphicsLayer { rotationZ = rot }
                             .liquidGlass(corner = 18.dp, strong = false)
                             .padding(14.dp)
                     ) {
@@ -201,15 +197,14 @@ fun ResultScreenVision(
                 item { Spacer(Modifier.height(100.dp)) }
             }
         }
-            }
     }
 
-        // Lottie confetti overlay – visionOS
-        if (showConfetti) {
-            VisionConfetti(
-                visible = true,
-                modifier = Modifier.fillMaxSize(),
-                onFinish = { showConfetti = false }
-            )
-        }
+    // Lottie confetti overlay – visionOS
+    if (showConfetti) {
+        VisionConfetti(
+            visible = true,
+            modifier = Modifier.fillMaxSize(),
+            onFinish = { showConfetti = false }
+        )
+    }
 }

@@ -24,6 +24,10 @@ import androidx.compose.ui.unit.dp
  * - Liquid Glass Card (designali-in)
  * - Liquid Glass (suraj-xd)
  * - Animated AI Chat glass-morphism (jatin-yadav05)
+ *
+ * Note: Android Compose doesn't support native background blur.
+ * The glass effect is achieved via translucent gradient overlays
+ * that let the paper background (#EBE7E2) show through — no blur needed.
  */
 
 // --- Liquid Glass Card ---
@@ -33,11 +37,17 @@ fun Modifier.visionGlass(
     alpha: Float = 0.44f,
     strong: Boolean = false
 ) = composed {
-    val bg = if (strong) Color.White.copy(alpha = 0.60f) else Color.White.copy(alpha = alpha)
+    val bgAlpha = if (strong) 0.60f else alpha
     this
         .clip(RoundedCornerShape(corner))
-        .background(bg)
-        .blur(if (strong) 22.dp else 16.dp) // background blur needs graphicsLayer – simulated via alpha
+        .background(
+            Brush.verticalGradient(
+                listOf(
+                    Color.White.copy(alpha = bgAlpha + 0.04f),
+                    Color.White.copy(alpha = bgAlpha)
+                )
+            )
+        )
         .border(
             1.dp,
             Brush.verticalGradient(
@@ -62,16 +72,25 @@ fun Modifier.visionGlass(
         }
 }
 
-// Frosted glass surface – simpler, performant
+// Frosted glass surface – translucent, shows paper background
 fun Modifier.liquidGlass(
     corner: Dp = 20.dp,
     strong: Boolean = false
 ) = this
     .clip(RoundedCornerShape(corner))
-    .background(
-        if (strong) Color.White.copy(alpha = 0.60f)
-        else Color.White.copy(alpha = 0.46f)
-    )
+    .drawBehind {
+        // translucent glass layer — paper bg shows through
+        val bgAlpha = if (strong) 0.60f else 0.46f
+        drawRoundRect(
+            brush = Brush.verticalGradient(
+                listOf(
+                    Color.White.copy(alpha = bgAlpha + 0.03f),
+                    Color.White.copy(alpha = bgAlpha - 0.03f)
+                )
+            ),
+            cornerRadius = CornerRadius(corner.toPx())
+        )
+    }
     .border(
         1.dp,
         Color.White.copy(alpha = 0.74f),
@@ -79,7 +98,7 @@ fun Modifier.liquidGlass(
     )
     .drawWithContent {
         drawContent()
-        // top specular
+        // top specular highlight
         drawRoundRect(
             brush = Brush.verticalGradient(
                 listOf(
@@ -136,10 +155,10 @@ fun Modifier.liquidGlassButton(
 // --- Spatial aurora background ---
 // SplineScene – serafim
 fun Modifier.visionAurora() = drawBehind {
-    // violet spot top-right
+    // violet spot top-right — higher alpha so visible through glass
     drawCircle(
         brush = Brush.radialGradient(
-            colors = listOf(Color(0xFFC2ACFF).copy(alpha = 0.32f), Color.Transparent),
+            colors = listOf(Color(0xFFC2ACFF).copy(alpha = 0.45f), Color.Transparent),
             center = Offset(size.width * 0.74f, size.height * 0.28f),
             radius = 320f
         ),
@@ -149,7 +168,7 @@ fun Modifier.visionAurora() = drawBehind {
     // cyan spot bottom-left
     drawCircle(
         brush = Brush.radialGradient(
-            colors = listOf(Color(0xFF8ADFFF).copy(alpha = 0.22f), Color.Transparent),
+            colors = listOf(Color(0xFF8ADFFF).copy(alpha = 0.35f), Color.Transparent),
             center = Offset(size.width * 0.18f, size.height * 0.78f),
             radius = 260f
         ),
@@ -159,7 +178,7 @@ fun Modifier.visionAurora() = drawBehind {
     // mint spot bottom
     drawCircle(
         brush = Brush.radialGradient(
-            colors = listOf(Color(0xFFCCE9A0).copy(alpha = 0.13f), Color.Transparent),
+            colors = listOf(Color(0xFFCCE9A0).copy(alpha = 0.22f), Color.Transparent),
             center = Offset(size.width * 0.5f, size.height * 1.05f),
             radius = 340f
         ),
