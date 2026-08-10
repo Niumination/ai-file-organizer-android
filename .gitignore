@@ -16,3 +16,7 @@ local.properties
 *.keystore
 play-store/signing/upload_certificate.pem
 # keystore & cert lokal (jangan commit)
+
+# Screenshot generation tools
+play-store/screenshots/node_modules/
+play-store/screenshots/package*.json
