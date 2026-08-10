@@ -1,0 +1,67 @@
+🧹 Messy phone files? Let AI fix it — with production-grade data safety & visionOS Liquid Glass UI.
+
+AI File Organizer v1.2 auto-organizes thousands of files on your phone / SD Card using Google Gemini AI, with a visionOS Liquid Glass design. This is a stability & data-safety update from v1.1: source files are ONLY deleted after byte-verified copies succeed, and scans are now cancellable.
+
+✨ WHAT'S NEW IN v1.2 — Stable & Safe for Production
+• Data-safe FileMover: source files are deleted ONLY AFTER copy is fully verified — no lost files
+• Pure dry-run: test mode creates ZERO folders — truly simulation only
+• AI_Organized excluded from rescans — no duplicate work
+• Automatic Gemini fallback: 2.5-flash → 2.0-flash → lite — always gets a response
+• Real-time progress: no more indeterminate spinners — know exactly when done
+• Lock button during processing — prevents accidental double-execution
+• Crash-resistant: invalid AI responses no longer crash the app
+• Folder selection persisted — no need to pick every time you open the app
+• New adaptive visionOS icon + full edge-to-edge design
+
+✨ KEY FEATURES (v1.1)
+• visionOS Liquid Glass UI — frosted glass, 3D orbs, spatial animations
+• CardStack folder picker — swipe 3D cards
+• Orbit AI scanner — real-time
+• Confetti sparkle on execution
+• AI Smart Categorize — reads FILE CONTENT, not just names
+  - PDF → auto-extracts first 2 pages
+  - Images → OCR receipts (Tokopedia, Shopee, Gojek), ID cards (100% on-device, ML Kit)
+  - TXT/MD/CSV/JSON → direct reading
+• 13 Smart Categories
+  Work_Documents, Receipts_Invoices, Personal_Photos, Family_Photos, Screenshots,
+  Video, Audio, Ebooks, Project_Archives, APK_Installers, Random_Downloads, Other
+• Auto-neat renaming
+  "IMG_4839.jpg" → "2024-06-22_Vacation_Bali.jpg"
+
+🔒 PRIVACY FIRST
+• Zero data collection — no analytics, no ads, no trackers
+• Your Gemini API key is stored encrypted (AES-256-GCM) — never goes to our servers
+• Files are NEVER uploaded in full — only text previews up to ~600 chars per file
+• OCR is 100% on-device via ML Kit — images never leave your phone
+• Only INTERNET + VIBRATE permissions — storage access only via folders you pick yourself (SAF)
+• Open source MIT — audit the source code anytime on GitHub
+
+🚀 HOW TO USE (3 steps)
+1. Get a free API key at aistudio.google.com/app/apikey
+2. Open app → choose folder (Download / DCIM / Documents)
+3. Tap "Start Scan" → preview results → tap "Execute" → files auto-organized!
+
+📁 OUTPUT
+SelectedFolder/AI_Organized/
+├── Work_Documents/PDF/
+├── Receipts_Invoices/Tokopedia/
+├── Personal_Photos/Camera/
+├── Family_Photos/
+├── Screenshots/
+├── Video/
+├── Audio/
+├── Ebooks/
+└── Project_Archives/
+
+PERFECT FOR
+✓ Phones overflowing with screenshots & random downloads
+✓ Freelancers organizing invoices & receipts
+✓ Students tidying lecture materials
+✓ Anyone whose phone files are chaotic
+
+MINIMUM REQUIREMENTS
+• Android 11 (API 30) or higher
+• 4GB RAM (for smooth ML Kit OCR)
+
+Free API key required — no Google Play account needed.
+Open source MIT — github.com/niumination/ai-file-organizer-android

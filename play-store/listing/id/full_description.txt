@@ -1,55 +1,69 @@
-🧹 HP penuh file berantakan? Biarkan AI yang beresin – dengan UI seindah visionOS!
+🧹 HP penuh file berantakan? Biarkan AI yang beresin — dengan keamanan data tingkat produksi.
 
-AI File Organizer v1.1 merapikan ribuan file di HP / SD Card otomatis pakai Google Gemini AI. Desain baru: Apple Vision Pro Liquid Glass.
+AI File Organizer v1.2 merapikan ribuan file HP / SD Card otomatis pakai Google Gemini AI, dengan antarmuka visionOS Liquid Glass. Ini adalah update stabilitas & keamanan data dari v1.1: file asal HANYA dihapus setelah salinan diverifikasi byte-demi-byte, dan proses scan/eksekusi bisa dibatalkan kapan saja.
 
-✨ YANG BARU DI v1.1
-• UI visionOS Liquid Glass – frosted glass, orbs 3D, animasi spatial
-• CardStack folder picker – geser kartu 3D
-• Orbit AI scanner – real-time
+✨ YANG BARU DI v1.2 — Stabil & Aman Produksi
+• Data-safe FileMover: file asal dihapus HANYA SETELAH salinan diverifikasi penuh — tidak ada file hilang
+• Dry-run murni: uji coba tidak membuat folder apa pun — benar-benar simulasi
+• AI_Organized tidak ikut discan ulang — tidak ada duplikasi proses
+• Fallback Gemini otomatis: 2.5-flash → 2.0-flash → lite — selalu dapat jawaban
+• Progress real-time: tidak lagi indeterminate — tahu persis kapan selesai
+• Tombol terkunci saat proses berjalan — anti double-execution
+• Crash tahan: parsing respons AI yang tidak valid tidak menghancurkan app
+• Folder pilihan tersimpan — tidak perlu pilih ulang tiap buka app
+• Ikon adaptive visionOS + edge-to-edge penuh
+
+✨ FITUR UNGGULAN (v1.1)
+• UI visionOS Liquid Glass — frosted glass, orbs 3D, animasi spatial
+• CardStack folder picker — geser kartu 3D
+• Orbit AI scanner — real-time
 • Confetti sparkle saat eksekusi
-• 40% lebih cepat, smoother
-
-✨ FITUR UNGGULAN
-• AI Smart Categorize – baca ISI file, bukan cuma nama
-  PDF → ekstrak otomatis • Gambar → OCR struk Tokopedia, Shopee, Gojek, KTP
+• AI Smart Categorize — baca ISI file, bukan cuma nama
+  - PDF → ekstrak 2 halaman pertama otomatis
+  - Gambar → OCR struk Tokopedia, Shopee, Gojek, KTP (100% on-device, ML Kit)
+  - TXT/MD/CSV/JSON → baca langsung
 • 13 Kategori cerdas Indonesia
-  Dokumen Kerja, Struk & Invoice, Foto Pribadi, Screenshot, Ebook, Video, Audio, Arsip Project, APK, dll
+  Dokumen Kerja, Struk & Invoice, Foto Pribadi, Foto Keluarga, Screenshot,
+  Video, Audio, Ebook, Arsip Project, APK Installer, Download Random, Lainnya
 • Rename otomatis rapi
   "IMG_4839.jpg" → "2024-06-22_Foto_Liburan_Bali.jpg"
-• 100% Aman – Scoped Storage (SAF)
-  Kamu pilih folder sendiri. App TIDAK BISA akses /Android
-• Preview dulu sebelum eksekusi + Dry-Run
 
 🔒 PRIVACY FIRST
-• Tidak upload file ke server kami
-• AI analisis hanya kirim teks preview max 600 karakter
-• API key disimpan EncryptedSharedPreferences (AES-256)
-• Open source – audit kapan saja
-• Tidak ada iklan, tidak ada tracker
+• Tidak ada data collection — tidak ada analytics, iklan, atau tracker
+• API key Gemini Anda disimpan terenkripsi (AES-256-GCM) — tidak pernah ke server kami
+• File TIDAK diupload utuh — hanya teks preview max ~600 karakter per file
+• OCR 100% on-device via ML Kit — gambar tidak meninggalkan HP Anda
+• Hanya izin INTERNET + VIBRATE — semua storage via folder yang Anda pilih sendiri (SAF)
+• Open source MIT — audit source code kapan saja di GitHub
 
-🚀 CARA PAKAI
-1. Dapatkan API key gratis di aistudio.google.com
-2. Pilih folder Download / DCIM / Dokumen
-3. Tap "Mulai Scan"
-4. AI analisis → lihat preview
-5. Tap Eksekusi → file langsung rapi!
+🚀 CARA PAKAI (3 langkah)
+1. Dapatkan API key gratis di aistudio.google.com/app/apikey
+2. Buka app → pilih folder Download / DCIM / Dokumen
+3. Tap "Mulai Scan" → lihat preview → tap "Eksekusi" → file rapi otomatis!
 
 📁 OUTPUT
 FolderPilihan/AI_Organized/
 ├── Dokumen_Kerja/PDF/
 ├── Struk_Invoice/Tokopedia/
 ├── Foto_Pribadi/Kamera/
+├── Foto_Keluarga/
+├── Screenshot/
+├── Video/
+├── Audio_Musik/
 ├── Ebook/
-└── ...
+├── Arsip_Project/
+├── APK_Installer/
+└── Download_Random/
 
 COCOK UNTUK
 ✓ HP penuh screenshot & download random
-✓ Freelancer rapikan invoice
+✓ Freelancer rapikan invoice & struk
 ✓ Mahasiswa rapikan materi kuliah
 ✓ Semua orang yang file HP-nya chaos
 
-Syarat: Android 11+
-API Key: gratis di aistudio.google.com/app/apikey
+SPEK MINIMAL
+• Android 11 (API 30) ke atas
+• 4GB RAM (agar ML Kit OCR lancar)
 
-Open source MIT
-github.com/niumination/ai-file-organizer-android
+API Key gratis, tidak perlu akun Google Play.
+Open source MIT — github.com/niumination/ai-file-organizer-android
