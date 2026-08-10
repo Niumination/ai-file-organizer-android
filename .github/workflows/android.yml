@@ -2,7 +2,7 @@ name: Android CI - Build APK
 
 on:
   push:
-    branches: [ "main", "master", "arena/**" ]
+    branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
   workflow_dispatch:
@@ -55,8 +55,8 @@ jobs:
       uses: softprops/action-gh-release@v2
       continue-on-error: true
       with:
-        tag_name: v1.2.${{ github.run_number }}
-        name: "AI File Organizer v1.2.${{ github.run_number }}"
+        tag_name: v1.0.${{ github.run_number }}
+        name: "AI File Organizer v1.0.${{ github.run_number }}"
         files: |
           AIFileOrganizer-debug.apk
           AIFileOrganizer-release.apk
