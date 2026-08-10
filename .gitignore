@@ -14,3 +14,5 @@ local.properties
 *.aab
 *.jks
 *.keystore
+play-store/signing/upload_certificate.pem
+# keystore & cert lokal (jangan commit)
