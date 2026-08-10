@@ -1,7 +1,6 @@
 package com.arena.aifileorganizer.ui.screens
 
 import android.net.Uri
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -14,44 +13,46 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.graphicsLayer
 import com.arena.aifileorganizer.ui.rememberVisionHaptics
 import com.arena.aifileorganizer.ui.theme.*
 import kotlinx.coroutines.launch
 
+private const val AI_STUDIO_URL = "https://aistudio.google.com/app/apikey"
+
 /**
- * HomeScreen – visionOS Liquid Glass
- * Refs:
- * - SplineScene – serafim – https://21st.dev/r/serafimcloud/splite
- * - Apple Tahoe Liquid Glass Button – easemize – https://21st.dev/r/easemize/apple-tahoe-liquid-glass-button
- * - Liquid Glass Card – designali-in – https://21st.dev/r/designali-in/liquid-glass-card
- * - CardStack – ruixen.ui – https://21st.dev/r/ruixen.ui/card-stack
- * - Interactive 3D Character – dhiluxui – https://21st.dev/r/dhileepkumargm/interactive-3d-character
- * - Animated AI Chat – jatin-yadav05 – https://21st.dev/r/jatin-yadav05/animated-ai-chat
+ * HomeScreen – visionOS Liquid Glass.
+ * Setup API key + folder sumber + tombol mulai scan.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenVision(
     apiKey: String?,
     treeUri: Uri?,
+    folderLabel: String?,
     onSaveApiKey: (String) -> Unit,
+    onClearApiKey: () -> Unit,
     onPickFolder: () -> Unit,
+    onClearFolder: () -> Unit,
     onStartScan: () -> Unit,
     canStart: Boolean
 ) {
     var keyInput by remember(apiKey) { mutableStateOf(apiKey ?: "") }
+    var keyVisible by remember { mutableStateOf(false) }
     val scroll = rememberScrollState()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val haptics = rememberVisionHaptics()
+    val uriHandler = LocalUriHandler.current
 
     Scaffold(
         containerColor = VisionColors.paper,
@@ -60,6 +61,7 @@ fun HomeScreenVision(
             Box(
                 Modifier
                     .fillMaxWidth()
+                    .statusBarsPadding()
                     .padding(top = 12.dp, start = 18.dp, end = 18.dp)
             ) {
                 Row(
@@ -70,7 +72,10 @@ fun HomeScreenVision(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         // orb logo – Animated AI Chat style
                         Box(
                             Modifier
@@ -90,21 +95,33 @@ fun HomeScreenVision(
                                 .border(1.dp, Color.White.copy(alpha = 0.65f), CircleShape)
                         )
                         Column {
-                            Text("AI File Organizer", fontWeight = FontWeight.SemiBold, fontSize = 14.5.sp, color = VisionColors.ink)
-                            Text("visionOS • Liquid Glass", fontSize = 10.5.sp, color = VisionColors.muted)
+                            Text(
+                                "AI File Organizer",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 14.5.sp,
+                                color = VisionColors.ink
+                            )
+                            Text(
+                                "visionOS • Liquid Glass",
+                                fontSize = 10.5.sp,
+                                color = VisionColors.muted
+                            )
                         }
                     }
-                    AssistChip(
-                        onClick = { },
-                        label = { Text("v1.1", fontSize = 10.5.sp) },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = Color.White.copy(alpha = 0.52f),
-                            labelColor = VisionColors.muted
-                        ),
-                        border = AssistChipDefaults.assistChipBorder(true,
-                            borderColor = Color.White.copy(alpha = 0.7f)
+                    Surface(
+                        shape = RoundedCornerShape(999.dp),
+                        color = Color.White.copy(alpha = 0.52f),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp, Color.White.copy(alpha = 0.7f)
                         )
-                    )
+                    ) {
+                        Text(
+                            "v1.2",
+                            fontSize = 10.5.sp,
+                            color = VisionColors.muted,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
         },
@@ -113,6 +130,7 @@ fun HomeScreenVision(
         Column(
             Modifier
                 .padding(pad)
+                .imePadding()
                 .verticalScroll(scroll)
                 .padding(horizontal = 18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -133,19 +151,19 @@ fun HomeScreenVision(
                 maxLines = 1
             )
             Text(
-                "Gemini • PDF • OCR • 100% Aman dengan SAF",
+                "Gemini • PDF • OCR on-device • 100% aman dengan SAF",
                 style = MaterialTheme.typography.bodyMedium,
                 color = VisionColors.muted
             )
 
-            // KPI
+            // KPI — honest stats, no fake counters
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                VisionKpi("1.284", "file discan", Modifier.weight(1f))
-                VisionKpi("13", "kategori", Modifier.weight(1f))
-                VisionKpi("98%", "akurat", Modifier.weight(1f))
+                VisionKpi("13", "kategori pintar", Modifier.weight(1f))
+                VisionKpi("100%", "privasi SAF", Modifier.weight(1f))
+                VisionKpi("0", "server kami", Modifier.weight(1f))
             }
 
-            // --- API Key — Liquid Glass Card — designali-in ---
+            // --- API Key — Liquid Glass Card ---
             Column(
                 Modifier
                     .fillMaxWidth()
@@ -153,20 +171,45 @@ fun HomeScreenVision(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text("🔑  Gemini API Key", fontWeight = FontWeight.SemiBold, fontSize = 13.8.sp)
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = Color.White.copy(alpha = 0.55f)
                     ) {
-                        Text(" terenkripsi ", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+                        Text(
+                            " terenkripsi ",
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        )
                     }
                 }
                 OutlinedTextField(
                     value = keyInput,
-                    onValueChange = { keyInput = it },
-                    placeholder = { Text("AIza...") },
+                    onValueChange = { keyInput = it.trim() },
+                    placeholder = { Text("AIza…") },
                     singleLine = true,
+                    visualTransformation =
+                        if (keyVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        TextButton(onClick = { keyVisible = !keyVisible }) {
+                            Text(
+                                if (keyVisible) "Sembunyikan" else "Lihat",
+                                fontSize = 11.5.sp,
+                                color = VisionColors.accent
+                            )
+                        }
+                    },
+                    isError = keyInput.isNotBlank() && !keyInput.startsWith("AIza"),
+                    supportingText = {
+                        if (keyInput.isNotBlank() && !keyInput.startsWith("AIza")) {
+                            Text("API key Gemini biasanya diawali \"AIza\"")
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(13.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -185,13 +228,33 @@ fun HomeScreenVision(
                             onSaveApiKey(keyInput)
                             scope.launch { snackbar.showSnackbar("API key tersimpan aman (terenkripsi) ✓") }
                         },
-                        enabled = keyInput.isNotBlank()
+                        enabled = keyInput.isNotBlank() && keyInput != apiKey
+                    )
+                    if (!apiKey.isNullOrBlank()) {
+                        OutlinedButton(
+                            onClick = {
+                                haptics.warning()
+                                onClearApiKey()
+                                scope.launch { snackbar.showSnackbar("API key dihapus") }
+                            },
+                            shape = RoundedCornerShape(13.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.White.copy(alpha = 0.38f),
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) { Text("Hapus", fontWeight = FontWeight.Medium) }
+                    }
+                }
+                TextButton(
+                    onClick = { uriHandler.openUri(AI_STUDIO_URL) },
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Text(
+                        "Belum punya key? Gratis di Google AI Studio ↗",
+                        fontSize = 12.sp,
+                        color = VisionColors.cyan
                     )
                 }
-                Text(
-                    "Tersimpan aman (EncryptedSharedPreferences) • open source",
-                    style = MaterialTheme.typography.bodySmall
-                )
             }
 
             // --- Folder picker – CardStack — ruixen.ui ---
@@ -202,18 +265,22 @@ fun HomeScreenVision(
                 letterSpacing = 0.8.sp
             )
             VisionCardStack(
-                pickedUri = treeUri?.toString(),
-                onPick = onPickFolder
+                folderLabel = folderLabel,
+                picked = treeUri != null,
+                onPick = onPickFolder,
+                onClear = onClearFolder
             )
 
             Spacer(Modifier.height(4.dp))
 
-            // --- CTA — Apple Tahoe Liquid Glass Button — easemize ---
+            // --- CTA — Apple Tahoe Liquid Glass Button ---
             LiquidGlassButton(
                 text = "Mulai Scan & Analisis AI →",
                 dark = true,
                 enabled = canStart,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
                 onClick = {
                     haptics.light()
                     onStartScan()
@@ -228,13 +295,13 @@ fun HomeScreenVision(
                 )
             }
             Text(
-                "Output → AI_Organized/  •  Pratinjau  •  Uji Coba",
+                "Output → AI_Organized/  •  Maks 150 file per scan  •  Uji coba dulu",
                 style = MaterialTheme.typography.bodySmall,
                 color = VisionColors.muted,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            Spacer(Modifier.height(80.dp))
+            Spacer(Modifier.height(48.dp))
         }
     }
 }
@@ -252,21 +319,21 @@ private fun SpatialHero() {
             .fillMaxWidth()
             .height(222.dp)
             .visionAurora()   // aurora drawn FIRST (behind liquid glass)
-            .liquidGlass(corner = 28.dp, strong = true) // glass on top, translucent
+            .liquidGlass(corner = 28.dp, strong = true)
             .pointerInput(Unit) {
-                detectDragGestures { change, drag ->
+                detectDragGestures { _, drag ->
                     ry = (ry + drag.x * 0.045f).coerceIn(-14f, 14f)
                     rx = (rx - drag.y * 0.045f).coerceIn(-10f, 10f)
                 }
             },
         contentAlignment = Alignment.Center
     ) {
-        // floating glass chips – Liquid Glass Button style
+        // floating glass chips
         GlassChip("PDF", Modifier.align(Alignment.TopStart).offset(x = 18.dp, y = 22.dp))
         GlassChip("OCR", Modifier.align(Alignment.TopEnd).offset(x = (-20).dp, y = 30.dp))
         GlassChip("Gemini", Modifier.align(Alignment.BottomStart).offset(x = 36.dp, y = (-22).dp))
 
-        // liquid orb – Animated AI Chat glass-morphism
+        // liquid orb
         Box(
             Modifier
                 .size(112.dp)
@@ -298,10 +365,7 @@ private fun SpatialHero() {
                     .clip(RoundedCornerShape(50))
                     .background(
                         Brush.radialGradient(
-                            listOf(
-                                Color.White.copy(alpha = 0.92f),
-                                Color.Transparent
-                            )
+                            listOf(Color.White.copy(alpha = 0.92f), Color.Transparent)
                         )
                     )
             )
@@ -322,8 +386,16 @@ private fun SpatialHero() {
                 .padding(14.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("SAF • Scoped Storage", style = MaterialTheme.typography.labelSmall, color = VisionColors.muted)
-            Text("Gemini 1.5 Flash", style = MaterialTheme.typography.labelSmall, color = VisionColors.muted)
+            Text(
+                "SAF • Scoped Storage",
+                style = MaterialTheme.typography.labelSmall,
+                color = VisionColors.muted
+            )
+            Text(
+                "Gemini Flash",
+                style = MaterialTheme.typography.labelSmall,
+                color = VisionColors.muted
+            )
         }
     }
 }
@@ -368,20 +440,21 @@ private fun VisionKpi(value: String, label: String, modifier: Modifier = Modifie
 }
 
 @Composable
-private fun VisionCardStack(pickedUri: String?, onPick: () -> Unit) {
+private fun VisionCardStack(
+    folderLabel: String?,
+    picked: Boolean,
+    onPick: () -> Unit,
+    onClear: () -> Unit
+) {
     val haptics = rememberVisionHaptics()
-    // CardStack – ruixen.ui
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(120.dp) // reduced from 134.dp for better fit
-    ) {
+
+    Box(Modifier.fillMaxWidth().height(120.dp)) {
         val items = listOf(
-            Triple("📁 /Android", "— dibatasi SAF", 2),
-            Triple("📁 /DCIM", "— 412 foto", 1),
+            Triple("🔒 /Android, obb, data", "otomatis dilewati demi keamanan", 2),
+            Triple("🗂 AI_Organized/", "hasil scan tidak discan ulang", 1),
             Triple(
-                pickedUri?.let { "📂 ${it.takeLast(32)}" } ?: "📂 Pilih folder…",
-                "SAF • akses terbatas",
+                if (picked) "📂 ${folderLabel ?: "(folder terpilih)"}" else "📂 Pilih folder…",
+                if (picked) "tersimpan — otomatis dipakai lagi" else "SAF • akses terbatas",
                 0
             )
         )
@@ -393,7 +466,7 @@ private fun VisionCardStack(pickedUri: String?, onPick: () -> Unit) {
                     .graphicsLayer {
                         scaleX = s.scale
                         scaleY = s.scale
-                        translationY = s.y + 4f // add slight bottom offset
+                        translationY = s.y + 4f
                         rotationZ = s.rot
                         alpha = s.alpha
                     }
@@ -401,33 +474,56 @@ private fun VisionCardStack(pickedUri: String?, onPick: () -> Unit) {
                     .padding(14.dp)
             ) {
                 Column {
-                    Text(title, fontWeight = FontWeight.SemiBold, fontSize = 13.3.sp,
-                        color = if (idx==0) VisionColors.ink else VisionColors.muted)
-                    Text(sub, style = MaterialTheme.typography.bodySmall,
-                        color = if (idx==0) VisionColors.muted else VisionColors.muted.copy(alpha = 0.8f))
+                    Text(
+                        title,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.3.sp,
+                        color = if (idx == 0) VisionColors.ink else VisionColors.muted,
+                        maxLines = 1
+                    )
+                    Text(
+                        sub,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (idx == 0) VisionColors.muted else VisionColors.muted.copy(alpha = 0.8f)
+                    )
                 }
             }
         }
     }
     Spacer(Modifier.height(8.dp))
-    OutlinedButton(
-        onClick = { haptics.tick(); onPick() },
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White.copy(alpha = 0.38f),
-            contentColor = VisionColors.ink
-        ),
-        border = ButtonDefaults.outlinedButtonBorder.copy(
-            brush = Brush.verticalGradient(
-                listOf(Color.White.copy(alpha = 0.82f), Color.White.copy(alpha = 0.44f))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedButton(
+            onClick = { haptics.tick(); onPick() },
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.White.copy(alpha = 0.38f),
+                contentColor = VisionColors.ink
+            ),
+            border = ButtonDefaults.outlinedButtonBorder.copy(
+                brush = Brush.verticalGradient(
+                    listOf(Color.White.copy(alpha = 0.82f), Color.White.copy(alpha = 0.44f))
+                )
             )
-        )
-    ) {
-        Text("Pilih Folder di Storage / SD Card", fontWeight = FontWeight.Medium)
+        ) {
+            Text(
+                if (picked) "Ganti Folder" else "Pilih Folder di Storage / SD Card",
+                fontWeight = FontWeight.Medium
+            )
+        }
+        if (picked) {
+            OutlinedButton(
+                onClick = { haptics.warning(); onClear() },
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White.copy(alpha = 0.38f),
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) { Text("Lepas", fontWeight = FontWeight.Medium) }
+        }
     }
     Text(
-        "App HANYA akses folder yang kamu pilih. /Android otomatis dilewati.",
+        "App HANYA mengakses folder yang kamu pilih. File tidak dikirim ke server kami — kategori dianalisis langsung oleh Gemini dengan API key milikmu.",
         style = MaterialTheme.typography.bodySmall,
         color = VisionColors.muted,
         modifier = Modifier.padding(top = 6.dp)
@@ -435,8 +531,7 @@ private fun VisionCardStack(pickedUri: String?, onPick: () -> Unit) {
 }
 
 /**
- * Liquid Glass Button – Apple Tahoe
- * Port of: https://21st.dev/r/easemize/apple-tahoe-liquid-glass-button
+ * Liquid Glass Button – Apple Tahoe.
  */
 @Composable
 fun LiquidGlassButton(
@@ -446,14 +541,10 @@ fun LiquidGlassButton(
     enabled: Boolean = true,
     dark: Boolean = false
 ) {
-    var hovered by remember { mutableStateOf(false) }
-    val sheen = rememberLiquidSheen(hovered)
-
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier
-            .liquidGlassButton(dark = dark),
+        modifier = modifier.liquidGlassButton(dark = dark),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
             contentColor = if (dark) Color(0xFFF5F3FF) else VisionColors.ink,

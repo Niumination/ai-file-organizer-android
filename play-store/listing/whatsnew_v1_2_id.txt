@@ -1,0 +1,10 @@
+v1.2 — Stabilitas & keamanan data
+• Eksekusi kini aman: file asal hanya dihapus setelah salinan terverifikasi penuh
+• Uji coba (dry-run) benar-benar simulasi — tidak lagi membuat folder apa pun
+• Folder hasil AI_Organized tidak ikut discan ulang
+• Model Gemini terbaru dengan fallback otomatis (2.5-flash → 2.0-flash → lite)
+• Folder pilihan tersimpan — tidak perlu pilih ulang tiap buka app
+• Scan & eksekusi bisa dibatalkan; tombol terkunci saat proses berjalan
+• Progress scan/eksekusi real-time, bukan lagi indeterminate
+• Ikon adaptive visionOS baru + edge-to-edge penuh
+• Perbaikan crash pada respons AI yang tidak valid

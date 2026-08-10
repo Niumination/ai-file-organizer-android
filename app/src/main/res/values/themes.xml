@@ -1,3 +1,14 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.AIFileOrganizer" parent="android:Theme.Material.Light.NoActionBar" />
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Warm-paper visionOS theme. Edge-to-edge is enabled at runtime via
+         Activity.enableEdgeToEdge(); transparent bars avoid the black strip. -->
+    <style name="Theme.AIFileOrganizer" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/vision_paper</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+    </style>
 </resources>
