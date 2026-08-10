@@ -1,4 +1,4 @@
-name: Android Signed Release – v1.1 visionOS
+name: Android Signed Release – v1.2 visionOS
 
 on:
   push:
