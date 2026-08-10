@@ -17,17 +17,20 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arena.aifileorganizer.OrganizerViewModel
+import com.arena.aifileorganizer.ui.rememberVisionHaptics
 import com.arena.aifileorganizer.ui.theme.*
+import kotlinx.coroutines.flow.first
 
 /**
- * ScanScreen – visionOS spatial scanner
- * Refs:
- * - Container Scroll Animation – aceternity – https://21st.dev/r/aceternity/container-scroll-animation
- * - Animated AI Chat (glass-morphism) – jatin-yadav05 – https://21st.dev/r/jatin-yadav05/animated-ai-chat
- * - Liquid Effect Animation – thanh – 264★
+ * ScanScreen – visionOS spatial scanner.
+ *
+ * Anti stale-navigation: each scan gets a sequence id from the ViewModel and
+ * we only navigate to the result when THE scan started by this composition
+ * instance reports Done(seq).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,8 +40,19 @@ fun ScanScreenVision(
     onBack: () -> Unit
 ) {
     val state by vm.scanState.collectAsState()
-    LaunchedEffect(Unit) { vm.startScan(maxFiles = 150) }
-    LaunchedEffect(state) { if (state is OrganizerViewModel.ScanState.Done) onDone() }
+    val haptics = rememberVisionHaptics()
+
+    // Sequence id of the scan owned by this composition. startScan sets the
+    // VM state to Running synchronously, so this can never piggyback on an
+    // old Done state.
+    var seq by remember { mutableStateOf(-1) }
+    LaunchedEffect(Unit) { seq = vm.startScan(OrganizerViewModel.DEFAULT_MAX_FILES) }
+
+    LaunchedEffect(seq) {
+        if (seq <= 0) return@LaunchedEffect
+        vm.scanState.first { (it as? OrganizerViewModel.ScanState.Done)?.seq == seq }
+        onDone()
+    }
 
     val bob = rememberVisionBob()
     val breathe = rememberVisionBreathe()
@@ -54,11 +68,12 @@ fun ScanScreenVision(
             TopAppBar(
                 title = { Text("Memindai Berkas…", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    TextButton(onClick = onBack) { Text("← Kembali", color = VisionColors.muted) }
+                    TextButton(onClick = {
+                        vm.cancelScan()
+                        onBack()
+                    }) { Text("← Kembali", color = VisionColors.muted) }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }
     ) { pad ->
@@ -72,7 +87,7 @@ fun ScanScreenVision(
                 color = VisionColors.ink
             )
 
-            // --- spatial scanner — Container Scroll Animation + Animated AI Chat ---
+            // --- spatial scanner ---
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -81,16 +96,9 @@ fun ScanScreenVision(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // orbit
-                    Box(
-                        Modifier.size(188.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        // conic glow ring
+                    Box(Modifier.size(188.dp), contentAlignment = Alignment.Center) {
                         Canvas(Modifier.fillMaxSize()) {
-                            withTransform({
-                                rotate(degrees = spin, pivot = center)
-                            }) {
+                            withTransform({ rotate(degrees = spin, pivot = center) }) {
                                 drawCircle(
                                     brush = Brush.sweepGradient(
                                         0f to Color(0xFFB99CFF).copy(alpha = 0.0f),
@@ -104,7 +112,6 @@ fun ScanScreenVision(
                                 )
                             }
                         }
-                        // core – Liquid Effect Animation style
                         Box(
                             Modifier
                                 .size(84.dp)
@@ -128,15 +135,15 @@ fun ScanScreenVision(
                         ) {
                             Text(
                                 when (state) {
-                                    is OrganizerViewModel.ScanState.Scanning -> "AI"
+                                    is OrganizerViewModel.ScanState.Running -> "AI"
                                     is OrganizerViewModel.ScanState.Done -> "✓"
+                                    is OrganizerViewModel.ScanState.Error -> "!"
                                     else -> "…"
                                 },
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color(0xFF3A3452)
                             )
                         }
-                        // floating glass chips
                         GlassMini("📄", Alignment.TopStart, Offset(-4f, 34f))
                         GlassMini("🖼️", Alignment.TopEnd, Offset(4f, 24f))
                         GlassMini("🧾", Alignment.BottomStart, Offset(28f, -4f))
@@ -144,52 +151,65 @@ fun ScanScreenVision(
 
                     Spacer(Modifier.height(18.dp))
 
-                    val msg = when (val s = state) {
-                        is OrganizerViewModel.ScanState.Scanning -> s.msg
-                        is OrganizerViewModel.ScanState.Error -> "Error: ${s.msg}"
-                        is OrganizerViewModel.ScanState.Done -> "Selesai!"
-                        else -> "Menyiapkan…"
-                    }
-                    Text(msg, fontWeight = FontWeight.Medium, fontSize = 14.sp)
-                    Spacer(Modifier.height(10.dp))
-
-                    // liquid progress — dynamic percentage
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(9.dp)
-                            .clip(RoundedCornerShape(999.dp))
-                            .background(Color.White.copy(alpha = 0.52f))
-                            .border(1.dp, Color.White.copy(alpha = 0.84f), RoundedCornerShape(999.dp))
-                    ) {
-                        val pct = when (val s = state) {
-                            is OrganizerViewModel.ScanState.Scanning -> {
-                                // parse progress from msg like "Ekstrak 5/150"
-                                val regex = Regex("""(\d+)/(\d+)""")
-                                val m = regex.find(s.msg)
-                                if (m != null) {
-                                    val cur = m.groupValues[1].toFloatOrNull() ?: 0f
-                                    val total = m.groupValues[2].toFloatOrNull() ?: 1f
-                                    (cur / total).coerceIn(0.02f, 0.97f)
-                                } else 0.45f // fallback
-                            }
-                            is OrganizerViewModel.ScanState.Done -> 1f
-                            else -> 0.12f
-                        }
-                        Box(
-                            Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(pct)
-                                .background(
-                                    Brush.horizontalGradient(
-                                        listOf(
-                                            Color(0xFFB99CFF),
-                                            Color(0xFF7FD9FF),
-                                            Color(0xFFB6F07A)
-                                        )
-                                    )
+                    when (val s = state) {
+                        is OrganizerViewModel.ScanState.Running -> {
+                            Text(s.phase, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                            if (s.detail.isNotBlank()) {
+                                Text(
+                                    s.detail,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = VisionColors.muted,
+                                    maxLines = 1,
+                                    textAlign = TextAlign.Center
                                 )
-                        )
+                            }
+                            Spacer(Modifier.height(10.dp))
+                            LiquidProgressBar(
+                                fraction = if (s.total > 0) {
+                                    (s.current.toFloat() / s.total.toFloat())
+                                } else {
+                                    0.15f
+                                }.coerceIn(0.02f, 0.98f)
+                            )
+                            if (s.total > 0) {
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    "${s.current} / ${s.total}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = VisionColors.muted
+                                )
+                            }
+                        }
+
+                        is OrganizerViewModel.ScanState.Error -> {
+                            Text(
+                                "Gagal memindai",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                s.message,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = VisionColors.muted,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.height(12.dp))
+                            Button(
+                                onClick = { haptics.light(); seq = vm.startScan() },
+                                shape = RoundedCornerShape(13.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF26232E),
+                                    contentColor = Color(0xFFF5F2FF)
+                                )
+                            ) { Text("↻ Coba Lagi", fontWeight = FontWeight.SemiBold) }
+                        }
+
+                        else -> {
+                            Text("Menyiapkan…", fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                            Spacer(Modifier.height(10.dp))
+                            LiquidProgressBar(fraction = 0.12f)
+                        }
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -201,21 +221,33 @@ fun ScanScreenVision(
                 }
             }
 
-            // KPI – 2x2 glass
-            val planItems = vm.plan.collectAsState().value
+            // KPI – 2x2 glass (live from the plan as it builds)
+            val planItems by vm.plan.collectAsState()
             val planSize = planItems.size
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 MetricGlass("Berkas", if (planSize > 0) "$planSize" else "—", Modifier.weight(1f))
-                MetricGlass("OCR", if (planSize > 0) "${planItems.count { !it.content?.ocrText.isNullOrBlank() }}" else "—", Modifier.weight(1f))
+                MetricGlass(
+                    "OCR",
+                    if (planSize > 0) "${planItems.count { !it.content?.ocrText.isNullOrBlank() }}" else "—",
+                    Modifier.weight(1f)
+                )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 val aiCount = planItems.count { it.decision.confidence > 0.5f }
                 MetricGlass("AI", if (planSize > 0) "$aiCount" else "—", Modifier.weight(1f))
-                MetricGlass("Kategori", if (planSize > 0) "${planItems.map { it.decision.category }.distinct().size}" else "—", Modifier.weight(1f))
+                MetricGlass(
+                    "Kategori",
+                    if (planSize > 0) "${planItems.map { it.decision.category }.distinct().size}" else "—",
+                    Modifier.weight(1f)
+                )
             }
 
             OutlinedButton(
-                onClick = onBack,
+                onClick = {
+                    haptics.warning()
+                    vm.cancelScan()
+                    onBack()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -229,8 +261,35 @@ fun ScanScreenVision(
                 )
             ) { Text("Batalkan") }
 
-            Spacer(Modifier.height(60.dp))
+            Spacer(Modifier.height(24.dp))
         }
+    }
+}
+
+@Composable
+private fun LiquidProgressBar(fraction: Float) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(9.dp)
+            .clip(RoundedCornerShape(999.dp))
+            .background(Color.White.copy(alpha = 0.52f))
+            .border(1.dp, Color.White.copy(alpha = 0.84f), RoundedCornerShape(999.dp))
+    ) {
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(fraction.coerceIn(0.02f, 1f))
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color(0xFFB99CFF),
+                            Color(0xFF7FD9FF),
+                            Color(0xFFB6F07A)
+                        )
+                    )
+                )
+        )
     }
 }
 
