@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI File Organizer v1.2 - Screenshot 2</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #E8E4DF 0%, #D4D0CA 100%);
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    }
+    .phone {
+      width: 390px; height: 844px;
+      background: #EBE7E2;
+      border-radius: 47px; overflow: hidden; position: relative;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.15), 0 0 0 12px #2C2C2C, 0 0 0 14px #3A3A3A;
+    }
+    .notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 126px; height: 37px; background: #1C1C1E; border-radius: 0 0 20px 20px;
+    }
+    .status-bar {
+      display: flex; justify-content: space-between; padding: 14px 24px 0;
+      font-size: 14px; font-weight: 600; color: #3A3A3A; position: relative; z-index: 2;
+    }
+    .screen {
+      padding: 24px; height: calc(100% - 37px); display: flex; flex-direction: column;
+    }
+    .orbit-container {
+      width: 200px; height: 200px; margin: 20px auto; position: relative;
+    }
+    .orbit-ring {
+      position: absolute; border-radius: 50%; border: 2px dashed rgba(88,86,214,0.3);
+      animation: orbit-spin 8s linear infinite;
+    }
+    .orbit-ring:nth-child(1) { width: 100%; height: 100%; top: 0; left: 0; }
+    .orbit-ring:nth-child(2) { width: 75%; height: 75%; top: 12.5%; left: 12.5%; animation-duration: 6s; animation-direction: reverse; }
+    .orbit-ring:nth-child(3) { width: 50%; height: 50%; top: 25%; left: 25%; animation-duration: 4s; }
+    .orbit-center {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 60px; height: 60px; background: linear-gradient(135deg, #007AFF, #5856D6);
+      border-radius: 16px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(88,86,214,0.4);
+    }
+    .orbit-center svg { width: 32px; height: 32px; }
+    @keyframes orbit-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .file-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      background: rgba(255,255,255,0.5); border-radius: 14px; margin-bottom: 8px;
+    }
+    .file-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .file-icon.pdf { background: rgba(255,59,48,0.15); }
+    .file-icon.img { background: rgba(0,122,255,0.15); }
+    .file-icon.doc { background: rgba(48,209,88,0.15); }
+    .file-info { flex: 1; }
+    .file-name { font-size: 14px; font-weight: 500; color: #1C1C1E; }
+    .file-size { font-size: 12px; color: #6E6E73; }
+    .progress-container { margin-top: auto; padding-top: 24px; }
+    .progress-bar { height: 8px; background: rgba(0,0,0,0.08); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #007AFF, #5856D6); border-radius: 4px; width: 67%; animation: progress-glow 2s ease-in-out infinite; }
+    @keyframes progress-glow { 0%,100% { opacity: 1; } 50% { opacity: 0.8; } }
+    .progress-text { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: #6E6E73; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="status-bar">
+      <span>9:42</span>
+      <span>📶 🔋</span>
+    </div>
+    <div class="screen">
+      <div class="header" style="text-align:center;margin-bottom:16px;">
+        <div class="title">Orbit AI Scanner</div>
+        <div class="subtitle">Menganalisis file Anda...</div>
+      </div>
+
+      <div class="orbit-container">
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
+        <div class="orbit-center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;">
+        <div class="file-item">
+          <div class="file-icon pdf">📄</div>
+          <div class="file-info">
+            <div class="file-name">struk_tokopedia.pdf</div>
+            <div class="file-size">2.4 MB • Dokumen Kerja</div>
+          </div>
+          <span style="color:#30D158;font-size:12px;">✓</span>
+        </div>
+        <div class="file-item">
+          <div class="file-icon img">🖼️</div>
+          <div class="file-info">
+            <div class="file-name">IMG_4839.jpg</div>
+            <div class="file-size">4.1 MB • Foto Pribadi</div>
+          </div>
+          <span style="color:#30D158;font-size:12px;">✓</span>
+        </div>
+        <div class="file-item">
+          <div class="file-icon doc">📝</div>
+          <div class="file-info">
+            <div class="file-name">laporan_keuangan.xlsx</div>
+            <div class="file-size">1.8 MB • Dokumen Kerja</div>
+          </div>
+          <span style="color:#007AFF;font-size:12px;">⏳</span>
+        </div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">
+          <span>67% selesai</span>
+          <span>127/190 file</span>
+        </div>
+        <button style="margin-top:16px;width:100%;padding:14px;border-radius:14px;border:none;background:rgba(255,59,48,0.1);color:#FF3B30;font-size:15px;font-weight:600;cursor:pointer;">
+          ⏸️ Batalkan Scan
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
