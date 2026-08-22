@@ -20,3 +20,6 @@ play-store/signing/upload_certificate.pem
 # Screenshot generation tools
 play-store/screenshots/node_modules/
 play-store/screenshots/package*.json
+
+# AI agent skills (installed by autoskills)
+.agents/
